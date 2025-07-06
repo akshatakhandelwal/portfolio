@@ -4,10 +4,67 @@ import { motion } from "framer-motion"
 import { ArrowDown, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function Hero() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+    if (!isClient) return
+
+    try {
+      const contactSection = document.getElementById("contact")
+      if (contactSection) {
+        contactSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        })
+        return
+      }
+
+      const sections = document.querySelectorAll("section")
+      let contactElement = null
+
+      sections.forEach((section) => {
+        if (section.id === "contact") {
+          contactElement = section
+        }
+      })
+
+      if (contactElement) {
+        const headerHeight = 100
+        const elementPosition = contactElement.offsetTop - headerHeight
+
+        window.scrollTo({
+          top: elementPosition,
+          behavior: "smooth",
+        })
+        return
+      }
+
+      window.scrollTo({
+        top: document.documentElement.scrollHeight - window.innerHeight,
+        behavior: "smooth",
+      })
+    } catch (error) {
+      console.error("Error scrolling to contact:", error)
+    }
+  }
+
+  const scrollDown = () => {
+    if (!isClient) return
+
+    const aboutSection = document.getElementById("about")
+    if (aboutSection) {
+      aboutSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
   }
 
   return (
@@ -49,7 +106,13 @@ export default function Hero() {
               transition={{ delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <Button size="lg" className="group" onClick={scrollToContact}>
+              <Button
+                size="lg"
+                className="group hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+                onClick={scrollToContact}
+                type="button"
+                style={{ cursor: "pointer" }}
+              >
                 <Mail className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                 Get In Touch
               </Button>
@@ -82,10 +145,12 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+        onClick={scrollDown}
+        style={{ cursor: "pointer" }}
       >
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
-          <ArrowDown className="h-6 w-6 text-muted-foreground" />
+          <ArrowDown className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
         </motion.div>
       </motion.div>
     </section>
